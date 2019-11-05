@@ -1,0 +1,26 @@
+{
+  "name": "booklistnode",
+  "version": "1.0.0",
+  "description": "This project I'm using:   * Server - Express app, GraphQL Server  * database - MongoDB (using [mLab](https://mlab.com/))  * Client - REACT, [Apollo](https://www.apollographql.com/docs/apollo-server/v1/), [GraphiQL](https://github.com/graphql/graphiql)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tkepassport39/BookListNode.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tkepassport39/BookListNode/issues"
+  },
+  "homepage": "https://github.com/tkepassport39/BookListNode#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-graphql": "^0.9.0",
+    "graphql": "^14.5.8",
+    "lodash": "^4.17.15",
+    "nodemon": "^1.19.4"
+  }
+}
