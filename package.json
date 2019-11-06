@@ -4,7 +4,8 @@
   "description": "This project I'm using:   * Server - Express app, GraphQL Server  * database - MongoDB (using [mLab](https://mlab.com/))  * Client - REACT, [Apollo](https://www.apollographql.com/docs/apollo-server/v1/), [GraphiQL](https://github.com/graphql/graphiql)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "mon": "npx nodemon server/app.js"
   },
   "repository": {
     "type": "git",
@@ -17,10 +18,12 @@
   },
   "homepage": "https://github.com/tkepassport39/BookListNode#readme",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphql": "^14.5.8",
     "lodash": "^4.17.15",
+    "mongoose": "^5.7.8",
     "nodemon": "^1.19.4"
   }
 }

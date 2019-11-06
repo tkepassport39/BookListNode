@@ -1,5 +1,8 @@
 const graphql = require('graphql');
 const _ = require('lodash');
+// import the mongo schema models so we can interact with them
+const Book = require('../models/book');
+const Author = require('../models/author');
 
 /*
     define: types, relationships, route queries
@@ -17,13 +20,14 @@ const {
 } = graphql;
 
 // dummy data
+/*
 var books = [
-    {name: 'name of the wind', genre: 'fantasy', id: '1', authorid: '1'},
-    {name: 'the final empire', genre: 'fantasy', id: '2', authorid: '2'},
-    {name: 'the long earth', genre: 'sci-fi', id: '3', authorid: '3'},
-    {name: 'the hero of ages', genre: 'fantasy', id: '4', authorid: '2'},
-    {name: 'the colour of magic', genre: 'fantasy', id: '5', authorid: '3'},
-    {name: 'the light fantastic', genre: 'sci-fi', id: '6', authorid: '3'},
+    {name: 'name of the wind', genre: 'fantasy', id: '1', authorId: '1'},
+    {name: 'the final empire', genre: 'fantasy', id: '2', authorId: '2'},
+    {name: 'the long earth', genre: 'sci-fi', id: '3', authorId: '3'},
+    {name: 'the hero of ages', genre: 'fantasy', id: '4', authorId: '2'},
+    {name: 'the colour of magic', genre: 'fantasy', id: '5', authorId: '3'},
+    {name: 'the light fantastic', genre: 'sci-fi', id: '6', authorId: '3'},
 ];
 
 var authors = [
@@ -31,6 +35,7 @@ var authors = [
     {name: 'brandon sanderson', age: 23, id: '2'},
     {name: 'terry pratchett', age: 89, id: '3'},
 ];
+*/
 
 // define our Book object type
 const BookType = new GraphQLObjectType({
@@ -46,8 +51,9 @@ const BookType = new GraphQLObjectType({
             // when nested data it will use the parent object
             resolve(parent, args){
                 //console.log(parent);
-                // look up parent (book) authorid and then call type author 
-                return _.find(authors, {id: parent.authorid});
+                //look up parent (book) authorId and then call type author 
+                // used with dummy data -> return _.find(authors, {id: parent.authorId});
+
             }
         }
     })
@@ -64,8 +70,9 @@ const AuthorType = new GraphQLObjectType({
         books: {
             type: new GraphQLList(BookType),
             resolve(parent, args){
-                // filter through books array for the specific authorid
-                return _.filter(books, {authorid: parent.id})
+                // filter through books array for the specific authorId
+                // used with dummy data -> return _.filter(books, {authorId: parent.id})
+
             }
         }
     })
@@ -85,8 +92,9 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args){
                 // code to get data from DB and other source
                 
-                //using lodash to search dummy data
-                return _.find(books, {id: args.id});
+                // using lodash to search dummy data
+                // used with dummy data -> return _.find(books, {id: args.id});
+
             }
         },
         author: {
@@ -97,7 +105,8 @@ const RootQuery = new GraphQLObjectType({
                 // code to get data from DB and other source
                 
                 //using lodash to search dummy data
-                return _.find(authors, {id: args.id});
+                // used with dummy data -> return _.find(authors, {id: args.id});
+
             }
         },
         // now when we want to return an entire list of books
@@ -105,20 +114,48 @@ const RootQuery = new GraphQLObjectType({
             type: new GraphQLList(BookType),
             resolve(parent, args){
                 // return entire list of dummy books data
-                return books
+                // used with dummy data -> return books
+
             }
         },
         authors: {
             type: new GraphQLList(AuthorType),
             resolve(present, args){
                 // return entire list of dummy authors data 
-                return authors
+                // used with dummy data -> return authors
+
             }
         }
     }
 });
 
+// In graphQL we need to explicitly define our mutations what data can be updated (changed, added, deleted).
+const Mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        // add author to db
+        addAuthor: {
+            type: AuthorType,
+            args: {
+                name: {type: GraphQLString},
+                age: {type: GraphQLInt}
+            },
+            resolve(parent, args){
+                // calling the model/collection author
+                let author = new Author({
+                    name: args.name,
+                    age: args.age
+                });
+                // connect to db and save
+                // we use return to get the data back when testing in graphiQL
+                return author.save();
+            }
+        }
+    }
+})
+
 // which query user can call from app.js
 module.exports = new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: Mutation
 });
