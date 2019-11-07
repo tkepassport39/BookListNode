@@ -42,7 +42,7 @@ const BookType = new GraphQLObjectType({
     name: 'Book',
     fields: () => ({
         // define the fields with graphQL string not regular string
-        id: {type: GraphQLID}, //before we used {type: GraphQLString},
+        id: {type: GraphQLID}, 
         name: {type: GraphQLString},
         genre: {type: GraphQLString},
         // type relations : which author belongs to which book
@@ -52,8 +52,10 @@ const BookType = new GraphQLObjectType({
             resolve(parent, args){
                 //console.log(parent);
                 //look up parent (book) authorId and then call type author 
-                // used with dummy data -> return _.find(authors, {id: parent.authorId});
-
+                // **** used with dummy data -> return _.find(authors, {id: parent.authorId});
+                console.log(parent);
+                // return from mongoDB where author id matches
+                return Author.findById(parent.authorId);
             }
         }
     })
@@ -65,14 +67,20 @@ const AuthorType = new GraphQLObjectType({
     fields: () => ({
         id: {type: GraphQLID},
         name: {type: GraphQLString},
-        age: {type: GraphQLID},
+        age: {type: GraphQLInt},
         // type relations : which book belongs to which author
         books: {
             type: new GraphQLList(BookType),
             resolve(parent, args){
                 // filter through books array for the specific authorId
-                // used with dummy data -> return _.filter(books, {authorId: parent.id})
+                // **** used with dummy data -> return _.filter(books, {authorId: parent.id})
 
+                // return from mongoDB where author id matches
+                // find method, look for all records with certain criteria
+                // look for books with authorid that matches the parent author ID 
+                return Book.find({
+                    authorId: parent.id
+                });
             }
         }
     })
@@ -94,7 +102,9 @@ const RootQuery = new GraphQLObjectType({
                 
                 // using lodash to search dummy data
                 // used with dummy data -> return _.find(books, {id: args.id});
-
+                
+                // grab data from Mongo
+                return Book.findById(args.id);
             }
         },
         author: {
@@ -106,7 +116,7 @@ const RootQuery = new GraphQLObjectType({
                 
                 //using lodash to search dummy data
                 // used with dummy data -> return _.find(authors, {id: args.id});
-
+                return Author.findById(args.id);
             }
         },
         // now when we want to return an entire list of books
@@ -116,6 +126,8 @@ const RootQuery = new GraphQLObjectType({
                 // return entire list of dummy books data
                 // used with dummy data -> return books
 
+                // return all books
+                return Books.find({});
             }
         },
         authors: {
@@ -124,6 +136,8 @@ const RootQuery = new GraphQLObjectType({
                 // return entire list of dummy authors data 
                 // used with dummy data -> return authors
 
+                // return all authors
+                return Author.find({});
             }
         }
     }
@@ -149,6 +163,25 @@ const Mutation = new GraphQLObjectType({
                 // connect to db and save
                 // we use return to get the data back when testing in graphiQL
                 return author.save();
+            }
+        },
+        addBook: {
+            type: BookType,
+            args: {
+                name: {type: GraphQLString},
+                genre: {type: GraphQLString},
+                authorId: {type: GraphQLID}
+            },
+            resolve(parent, args){
+                //calling the model/collection book
+                let book = new Book({
+                    name: args.name,
+                    genre: args.genre,
+                    authorId: args.authorId
+                });
+                // connect to db and save
+                // we use return to get the data back when testing in graphiQL
+                return book.save();
             }
         }
     }
