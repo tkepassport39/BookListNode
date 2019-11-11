@@ -5,6 +5,8 @@ const graphqlHTTP = require('express-graphql');
 const schema = require('./schema/schema');
 // import mongoose
 const mongoose = require('mongoose');
+// allow client speak to server graphiql
+const cors = require('cors');
 // there is a env file at root of this project
 require('dotenv').config();
 
@@ -16,6 +18,9 @@ const {
 } = process.env;
 
 const app = express();
+
+// allow cross-origin requests
+app.use(cors());
 
 // connect to mongodb atlas cluster
 mongoose.connect(`mongodb+srv://${mongo_username}:${mongo_password}@${mongo_db_url}?retryWrites=true&w=majority`, 

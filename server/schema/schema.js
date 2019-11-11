@@ -16,7 +16,8 @@ const {
     GraphQLSchema,
     GraphQLID,
     GraphQLInt,
-    GraphQLList // used in Author, because each author has many book relation
+    GraphQLList, // used in Author, because each author has many book relation
+    GraphQLNonNull // to not accept null values for certain fields
 } = graphql;
 
 // dummy data
@@ -53,8 +54,9 @@ const BookType = new GraphQLObjectType({
                 //console.log(parent);
                 //look up parent (book) authorId and then call type author 
                 // **** used with dummy data -> return _.find(authors, {id: parent.authorId});
-                console.log(parent);
-                // return from mongoDB where author id matches
+                // below is returning the authorId from Book collection
+                //console.log(parent.authorId)
+                // we are sending the authorID from book collection to Author schema, to return the author properties with same ID from its collection.
                 return Author.findById(parent.authorId);
             }
         }
@@ -74,7 +76,6 @@ const AuthorType = new GraphQLObjectType({
             resolve(parent, args){
                 // filter through books array for the specific authorId
                 // **** used with dummy data -> return _.filter(books, {authorId: parent.id})
-
                 // return from mongoDB where author id matches
                 // find method, look for all records with certain criteria
                 // look for books with authorid that matches the parent author ID 
@@ -103,7 +104,7 @@ const RootQuery = new GraphQLObjectType({
                 // using lodash to search dummy data
                 // used with dummy data -> return _.find(books, {id: args.id});
                 
-                // grab data from Mongo
+                // grab data from MongoDB
                 return Book.findById(args.id);
             }
         },
@@ -114,7 +115,7 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args){
                 // code to get data from DB and other source
                 
-                //using lodash to search dummy data
+                // using lodash to search dummy data
                 // used with dummy data -> return _.find(authors, {id: args.id});
                 return Author.findById(args.id);
             }
@@ -126,8 +127,8 @@ const RootQuery = new GraphQLObjectType({
                 // return entire list of dummy books data
                 // used with dummy data -> return books
 
-                // return all books
-                return Books.find({});
+                // return all books with the help of empty object {}
+                return Book.find({});
             }
         },
         authors: {
@@ -136,7 +137,7 @@ const RootQuery = new GraphQLObjectType({
                 // return entire list of dummy authors data 
                 // used with dummy data -> return authors
 
-                // return all authors
+                // return all authors with the help of empty object {}
                 return Author.find({});
             }
         }
@@ -151,8 +152,8 @@ const Mutation = new GraphQLObjectType({
         addAuthor: {
             type: AuthorType,
             args: {
-                name: {type: GraphQLString},
-                age: {type: GraphQLInt}
+                name: {type: new GraphQLNonNull(GraphQLString)},
+                age: {type: new GraphQLNonNull(GraphQLInt)}
             },
             resolve(parent, args){
                 // calling the model/collection author
@@ -168,9 +169,9 @@ const Mutation = new GraphQLObjectType({
         addBook: {
             type: BookType,
             args: {
-                name: {type: GraphQLString},
-                genre: {type: GraphQLString},
-                authorId: {type: GraphQLID}
+                name: {type: new GraphQLNonNull(GraphQLString)},
+                genre: {type: new GraphQLNonNull(GraphQLString)},
+                authorId: {type: new GraphQLNonNull(GraphQLID)}
             },
             resolve(parent, args){
                 //calling the model/collection book
