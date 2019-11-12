@@ -1,11 +1,11 @@
 // eslint-disable-next-line
 import React, {Component} from 'react';
-import {gql} from 'apollo-boost';
 // help bind apollo to REACT
 import { useQuery } from '@apollo/react-hooks';
+import {getBooksQuery} from '../queries/queries';
 
-// queries
-const getBooksQuery = gql`
+// query moved to ../queries/queries
+/*const getBooksQuery = gql`
     {
         books{
             name
@@ -14,7 +14,7 @@ const getBooksQuery = gql`
     }
 
 `;
-
+*/
 // create a function Component
 const BookList = () => {
 

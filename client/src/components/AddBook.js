@@ -1,11 +1,11 @@
 // eslint-disable-next-line
-import React, {Component} from 'react';
-import {gql} from 'apollo-boost';
+import React, {Component, useState} from 'react';
+import { getAuthorsQuery } from '../queries/queries';
 // help bind apollo to REACT
-// eslint-disable-next-line
-import { useQuery, RenderPromises } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/react-hooks';
 
-// queries
+// query moved to ../queries/queries
+/*
 const getAuthorsQuery = gql`
     {
         authors{
@@ -15,9 +15,22 @@ const getAuthorsQuery = gql`
     }
 
 `;
-
-// class component
+*/
+// function component
 const AddBook = () => {
+
+    /*constructor(props){
+        super(props);
+        this.state = {
+            name: '',
+            genre: '',
+            authorId: ''
+        };
+    };
+    */
+    const [bookName, setName] = useState('');
+    const [bookGenre, setGenre] = useState('');
+    const [bookAuthorId, setAuthorId] = useState('');
 
     const { loading, error, data } = useQuery(getAuthorsQuery);
 
@@ -32,23 +45,36 @@ const AddBook = () => {
         );
     });
 
+
+    const nameChange = event => {
+        setName(event.target.value);
+    }
+
+    const genreChange = event => {
+        setGenre(event.target.value);
+    }
+
+    const authorChange = event => {
+        setAuthorId(event.target.value);
+    }
+
     return(
         <form id="add-book">
 
             <div className="field">
                 <label>Book name:</label>
-                <input type="text" />
+                <input value={ bookName } type="text" onChange={ nameChange } />
             </div>
 
             <div className="field">
                 <label>Genre:</label>
-                <input type="text" />
+                <input value={ bookGenre } type="text" onChange={ genreChange } />
             </div>
 
             <div className="field">
                 <label>Author:</label>
-                <select>
-                    <option value="" selected disabled hidden>Select author</option>
+                <select defaultValue={'default'} onChange={ authorChange } >
+                <option value="default" hidden disabled >Select author</option>
                     {displayAuthors}
                 </select>
             </div>
