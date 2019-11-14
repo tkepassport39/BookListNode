@@ -1,88 +1,104 @@
 // eslint-disable-next-line
-import React, {Component, useState} from 'react';
-import { getAuthorsQuery } from '../queries/queries';
+import React, { useMemo, useCallback, useState } from 'react';
+import { getAuthorsQuery, addBookMutation, getBooksQuery } from '../queries/queries';
 // help bind apollo to REACT
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 
-// query moved to ../queries/queries
-/*
-const getAuthorsQuery = gql`
-    {
-        authors{
-            name
-            id
-        }
+const getOptions = (loading, error, data) => {
+    if(loading){
+        return <option>Loading Authors...</option>;
     }
+    else if (error){
+        return <option>Error...</option>;
+    }
+    else{
+        return data.authors.map(({ id, name}) => {
+            return (
+                <option key={id} value={id || ''}> { name } </option> 
+            );
+        });
+    };
+}
 
-`;
-*/
 // function component
 const AddBook = () => {
 
-    /*constructor(props){
-        super(props);
-        this.state = {
-            name: '',
-            genre: '',
-            authorId: ''
-        };
-    };
-    */
-    const [bookName, setName] = useState('');
-    const [bookGenre, setGenre] = useState('');
-    const [bookAuthorId, setAuthorId] = useState('');
-
     const { loading, error, data } = useQuery(getAuthorsQuery);
+    const [addBook] = useMutation(addBookMutation);
+    /*
+    const [name, setName] = useState('');
+    const [genre, setGenre] = useState('');
+    const [author, setAuthor] = useState('');
+    */
+    const [inputs, setInputs] = useState({});
 
-    if (loading) return <p>Loading Authors...</p>;
-    if (error) return <p>Error</p>;
+    // 
+    const displayAuthors = useMemo(() => getOptions(loading, error, data),[
+        loading,
+        error,
+        data
+    ]);
 
-    const AuthorsList = data;
+    // in order to use callback i can't use a return before so i had to create a function above addBook()
+    // ***** OPTION B ********
+    /*const nameCB = useCallback(e => setName(e.target.value), []);
+    const genreCB = useCallback(e => setGenre(e.target.value), []);
+    const authorCB = useCallback(e => setAuthor(e.target.value), []);
+    const addCB = useCallback(
+        e => {
+            e.preventDefault();
+            addBook().then(res => console.log(res));
+            console.log(`name: ${name}, genre: ${genre}, author: ${author}`);
+        },
+        [name, genre, author]
+    );*/
+    const handleInputChange = useCallback((event) => {
+        event.persist();
+        setInputs(inputs => ({...inputs,
+            [event.target.name]: event.target.value,
+        }));
+    }, []);
+    
+    // use refetchQueries to update getBooksQuery section on the web app 
+    const handleSubmit = useCallback((event) => {
+        if(event){
+            event.preventDefault();
+            addBook({
+                variables:{
+                    name: inputs.name,
+                    genre: inputs.genre,
+                    authorId: inputs.authorId
+                },
+                refetchQueries: [{ query: getBooksQuery }]
+            });
+            //console.log("name: "+[inputs.name] +", genre: "+ [inputs.genre]+", author: "+[inputs.authorId])
+        }
+    }, [inputs]);
 
-    const displayAuthors = AuthorsList.authors.map(({ id, name}) => {
-        return (
-            <option key={id} value={id}> {name} </option>
-        );
-    });
+   return (
+    <form id="add-book" onSubmit={ handleSubmit }>
+        <div className="field">
+            <label>Book name:</label>
+            <input value={ inputs.name || ''} name="name" type="text" onChange={ handleInputChange } />
+        </div>
 
+        <div className="field">
+            <label>Genre:</label>
+            <input value={ inputs.genre || ''} name="genre" type="text" onChange={ handleInputChange } />
+        </div>
 
-    const nameChange = event => {
-        setName(event.target.value);
-    }
+        <div className="field">
+            <label>Author:</label>
+            <select defaultValue={'default'} name="authorId" onChange={ handleInputChange } >
+            <option value="default" hidden disabled >Select author</option>
+                {displayAuthors}
+            </select>
+        </div>
 
-    const genreChange = event => {
-        setGenre(event.target.value);
-    }
-
-    const authorChange = event => {
-        setAuthorId(event.target.value);
-    }
-
-    return(
-        <form id="add-book">
-
-            <div className="field">
-                <label>Book name:</label>
-                <input value={ bookName } type="text" onChange={ nameChange } />
-            </div>
-
-            <div className="field">
-                <label>Genre:</label>
-                <input value={ bookGenre } type="text" onChange={ genreChange } />
-            </div>
-
-            <div className="field">
-                <label>Author:</label>
-                <select defaultValue={'default'} onChange={ authorChange } >
-                <option value="default" hidden disabled >Select author</option>
-                    {displayAuthors}
-                </select>
-            </div>
-
-            <button>+</button>
-
-        </form>
-    )
+        <button>+</button>
+    </form>
+   );
 };
+
 
 export default AddBook;
