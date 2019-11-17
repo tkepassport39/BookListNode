@@ -4,37 +4,60 @@ import React, {Component} from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import {getBookQuery} from '../queries/queries';
 
-const BookDetails = () => {
+const BookDetails = ({bookId}) => {
+    // if no bookId (which happens first time app runs) then ignore the useQuery function
+    const { loading, error, data } = useQuery(getBookQuery, {
+        variables: {
+            id: bookId
+        },
+        skip: !bookId,
+    });
 
-    const { loading, error, data } = useQuery(getBookQuery);
+    let bookContent;
   
     if (loading) {
-        return <p>Loading Book Details...</p>;
+        bookContent = <p>Loading Book Details...</p>;
     }
-    if (error) return (<p>** Error **</p>);
+    else if (error) {
+        bookContent = <p>** Error **</p>;
+    }
+    else if (!bookId){
+        bookContent = <p>There is no book selected...</p>
+    }
+    else {
+        // extract below keys from data so that we can call them by the key name 
+        const {
+            book: {name, genre, author}
+        } = data
 
-    //const { books } = data;
-    /*
-    const bookListItems = books.map(({ id, name}) => {
-        return <li key= {id}> {name} </li> 
-    });
-    */
+        // look through the books array and output each value 
+        const books = author.books.map(({id, name}) => {
+            return <li key={id}>{name}</li>
+        })
+
+        // short hand fragments when no parent element
+        bookContent = (
+            <>
+            <h2>{name}</h2>
+            <p><b>Genre: </b> {genre}</p>
+            <p><b>Author: </b>{author.name}</p>
+            <p><b>Book List: </b></p>
+            <ul className="other-books"> {books} </ul>
+            </> 
+        );
+    }
+
+    // peak at how the data looks
+    //console.log(data)
+
     return(
+        
         <div id="book-details">
-            <p> output book details here</p>
-        </div>
-    )
-    
-    // below would cause a error on console saying keys need to be unique. Fixed with code up top.
-    /*return data.books.map(({ id, name}) => (
-        <div>
-            <ul id="book-list">
-                <li key= {id}> {name} </li>
-            </ul>
-        </div>
-    ));
-    */
+            {bookContent}
 
+        </div>
+    );
+    
 };
 
 export default BookDetails;
