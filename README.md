@@ -30,9 +30,7 @@ Follow these steps:
 * Run `npm run watch` to get nodemon running. It will startup GraphiQL and also connect to MongoDB Atlas.
 * If you want to access graphiQL, you just need to input in your web browser URL: `http://localhost:4000/graphql`
     * Example of what commands to run:
-    ![graphiQL](images/GraphiQL_mutation_addAuthor_checkNonNull.png)
+    ![graphiQL](images/GraphiQL_mutation_addAuthor.png)
 * Open new tab on terminal, and navigate to `cd client/` 
 * Run `npm start` to get React to start.
 * You can now access the React app on `http://localhost:3000`
-
-
