@@ -1,7 +1,7 @@
 {
   "name": "booklistnode",
   "version": "1.0.0",
-  "description": "This project I'm using:   * Server - Express app, GraphQL Server  * database - MongoDB (using [mLab](https://mlab.com/))  * Client - REACT, [Apollo](https://www.apollographql.com/docs/apollo-server/v1/), [GraphiQL](https://github.com/graphql/graphiql)",
+  "description": "This project I'm using:   * Server - Express app, GraphQL Server  * database - MongoDB atlas  * Client - REACT, [Apollo](https://www.apollographql.com/docs/apollo-server/v1/), [GraphiQL](https://github.com/graphql/graphiql)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
